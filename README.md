@@ -105,3 +105,7 @@ Dispatches a request to the handlers.
 ## Why "Serene"?
 
 I went to thesaurus.com and looked up synonyms for "RESTful".
+
+## Middleware etc
+
+You can find related packages such as middleware and handlers under the [serene](https://www.npmjs.com/browse/keyword/serene) keyword on NPM.
