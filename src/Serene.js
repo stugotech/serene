@@ -11,7 +11,7 @@ export default class Serene {
   dispatch(operation, resource, query, body, id) {
     let request = {operation, resource, query, body, id};
     let response = {result: null, status: null, headers: {}, end() {this._end = true;}};
-    return reduce(request, response, this.handlers);
+    return Promise.resolve(reduce(request, response, this.handlers));
   }
 
 

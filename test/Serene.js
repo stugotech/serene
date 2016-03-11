@@ -127,6 +127,7 @@ describe('Serene', function () {
   });
 
   it('should not complain if there are no handlers', function () {
-    return service.dispatch('list', 'widgets', {size: 5}, {name: 'fred'}, '3');
+    let promise = service.dispatch('list', 'widgets', {size: 5}, {name: 'fred'}, '3');
+    expect(promise.then).to.exist;
   });
 });
