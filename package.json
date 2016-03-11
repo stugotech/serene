@@ -18,7 +18,8 @@
     "json",
     "api",
     "rest",
-    "restful"
+    "restful",
+    "serene"
   ],
   "author": "Stewart MacKenzie-Leigh",
   "license": "ISC",
