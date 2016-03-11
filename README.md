@@ -46,7 +46,7 @@ service.use(function (request, response) {
 The handler function is passed two parameters, namely `request` and `response`.  The `request` object has the following fields:
 
   * `operation` - a string specifying which of the above operations the request is for
-  * `resource` - the name of the resource to operate on
+  * `resourceName` - the name of the resource to operate on
   * `query` - additional parameters from the querystring
   * `body` - an object representing the request body parsed as a JSON object (only applicable to `create`, `update` and `replace` requests)
   * `id` - a string representing the ID of the resource to operate on (only applicable to `get`, `update` and `replace` requests)
@@ -90,14 +90,14 @@ Adds a handler specifically for the `replace` operation.
 
 Adds a handler specifically for the `delete` operation.
 
-#### `dispatch(operation, resource, query, body, id)`
+#### `dispatch(operation, resourceName, query, body, id)`
 
 Dispatches a request to the handlers.
 
 **Parameters**
 
   * `operation` - a string, one of the above operation types
-  * `resource` - the name of the resource
+  * `resourceName` - the name of the resource
   * `query` - an object representing the parsed querystring
   * `body` - an object representing the parsed request body
   * `id` - the ID of the object the request is for

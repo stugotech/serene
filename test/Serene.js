@@ -15,7 +15,7 @@ describe('Serene', function () {
 
     let expectedRequest = {
       operation: 'list',
-      resource: 'widgets',
+      resourceName: 'widgets',
       query: {size: 5},
       body: {name: 'fred'},
       id: '3'
