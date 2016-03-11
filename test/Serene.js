@@ -109,4 +109,24 @@ describe('Serene', function () {
         expect(calls).to.eql([1]);
       });
   });
+
+  it('should throw an error if no result is returned', function () {
+    service.use(function (request, response) {
+
+    });
+
+    return service.dispatch('list', 'widgets', {size: 5}, {name: 'fred'}, '3')
+      .then(
+        function () {
+          throw Error('expected error');
+        },
+        function () {
+
+        }
+      );
+  });
+
+  it('should not complain if there are no handlers', function () {
+    return service.dispatch('list', 'widgets', {size: 5}, {name: 'fred'}, '3');
+  });
 });

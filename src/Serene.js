@@ -30,15 +30,15 @@ export default class Serene {
 
 
 function reduce(request, response, handlers, i=0) {
-  return Promise.resolve(handlers[i](request, response))
-    .then(function (response) {
-      if (!response)
-        throw new Error(`handler ${handlers[i].name} did not return a response`);
+  if (!response._end && i < handlers.length) {
+    return Promise.resolve(handlers[i](request, response))
+      .then(function (response) {
+        if (!response)
+          throw new Error(`handler ${handlers[i].name} did not return a response`);
 
-      if (!response._end && i < handlers.length - 1) {
         return reduce(request, response, handlers, i + 1)
-      } else {
-        return response;
-      }
-    });
+      });
+  } else {
+    return response;
+  }
 }
