@@ -53,7 +53,7 @@ describe('Serene', function () {
       return Promise.resolve(5);
     });
 
-    return service.dispatch('list', 'widgets', {size: 5}, {name: 'fred'}, '3')
+    return service.dispatch('list', 'widgets')
       .then(function (response) {
         expect(response).to.equal(5);
       });
@@ -69,7 +69,7 @@ describe('Serene', function () {
       throw new Error('should not have been called');
     });
 
-    return service.dispatch('list', 'widgets', {size: 5}, {name: 'fred'}, '3');
+    return service.dispatch('list', 'widgets');
   });
 
   it('should call specific handler for relevant operation', function () {
@@ -85,7 +85,7 @@ describe('Serene', function () {
       return response;
     });
 
-    return service.dispatch('list', 'widgets', {size: 5}, {name: 'fred'}, '3')
+    return service.dispatch('list', 'widgets')
       .then(function (response) {
         expect(calls).to.eql([1,2]);
       });
@@ -104,7 +104,7 @@ describe('Serene', function () {
       return response;
     });
 
-    return service.dispatch('list', 'widgets', {size: 5}, {name: 'fred'}, '3')
+    return service.dispatch('list', 'widgets')
       .then(function (response) {
         expect(calls).to.eql([1]);
       });
@@ -115,7 +115,7 @@ describe('Serene', function () {
 
     });
 
-    return service.dispatch('list', 'widgets', {size: 5}, {name: 'fred'}, '3')
+    return service.dispatch('list', 'widgets')
       .then(
         function () {
           throw Error('expected error');
@@ -127,7 +127,27 @@ describe('Serene', function () {
   });
 
   it('should not complain if there are no handlers', function () {
-    let promise = service.dispatch('list', 'widgets', {size: 5}, {name: 'fred'}, '3');
+    let promise = service.dispatch('list', 'widgets');
     expect(promise.then).to.exist;
+  });
+
+  it('should allow registration of objects with a handle method', function () {
+    let called = false;
+
+    let obj = {
+      name: 'test',
+      handle(request, response) {
+        called = true;
+        expect(this.name).to.equal('test');
+        return response;
+      }
+    };
+
+    service.use(obj);
+
+    return service.dispatch('list', 'widgets')
+      .then(function (response) {
+        expect(called).to.be.true;
+      });
   });
 });

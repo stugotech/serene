@@ -16,7 +16,13 @@ export default class Serene {
 
 
   use(handler) {
-    this.handlers.push(handler);
+    if (typeof handler === 'function') {
+      this.handlers.push(handler);
+    } else if (handler.handle) {
+      this.handlers.push(handler.handle.bind(handler));
+    } else {
+      throw new Error('handler must be either a function or an object with a handle method');
+    }
   }
 };
 
