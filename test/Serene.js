@@ -118,10 +118,24 @@ describe('Serene', function () {
     return service.dispatch('list', 'widgets')
       .then(
         function () {
-          throw Error('expected error');
+          throw new Error('expected error');
         },
         function () {
+        }
+      );
+  });
 
+  it('should throw an error if an error is thrown in the handler', function () {
+    service.use(function (request, response) {
+      throw new Error();
+    });
+
+    return service.dispatch('list', 'widgets')
+      .then(
+        function () {
+          throw new Error('expected error');
+        },
+        function () {
         }
       );
   });
