@@ -18,7 +18,6 @@ let service = new Serene();
 
 service.use(function (request, response) {
   // do some stuff
-  return response;
 });
 
 ```
@@ -39,7 +38,6 @@ It allows you to register handler functions for these operations:
 ```js
 service.use(function (request, response) {
   // do some stuff
-  return response;
 });
 ```
 
@@ -58,7 +56,7 @@ The `response` object has the following fields:
   * `headers` - a hash of headers to return
   * `end()` - bail out the handler stack
 
-Each handler must return the response (or a promise of the response), which is passed into the next handler.  The handlers are executed in the order in which they were registered; by default all the handlers registered are executed, unless `response.end()` is called, which prevents further handlers being executed.
+The handlers are executed in the order in which they were registered; by default all the handlers registered are executed, unless `response.end()` is called, which prevents further handlers being executed.  If a handler returns a promise, the promise will be awaited before continuing with the next handler.
 
 ### API
 
