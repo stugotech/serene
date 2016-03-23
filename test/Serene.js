@@ -29,7 +29,6 @@ describe('Serene', function () {
       expect(response.headers).to.exist;
 
       response.result = 'a result';
-      return response;
     });
 
     service.use(function (request, response) {
@@ -38,8 +37,6 @@ describe('Serene', function () {
       expect(response.result).to.equal('a result');
       expect(response.status).to.be.null;
       expect(response.headers).to.exist;
-
-      return response;
     });
 
     return service.dispatch('list', 'widgets', {size: 5}, {name: 'fred'}, '3')
@@ -50,19 +47,20 @@ describe('Serene', function () {
 
   it('should allow promises to be returned', function () {
     service.use(function (request, response) {
-      return Promise.resolve(5);
+      return Promise.resolve(5).then(function (v) {
+        response.value = v;
+      });
     });
 
     return service.dispatch('list', 'widgets')
       .then(function (response) {
-        expect(response).to.equal(5);
+        expect(response.value).to.equal(5);
       });
   });
 
   it('should bail if end() is called', function () {
     service.use(function (request, response) {
       response.end();
-      return response;
     });
 
     service.use(function (request, response) {
@@ -77,12 +75,10 @@ describe('Serene', function () {
 
     service.use(function (request, response) {
       calls.push(1);
-      return response;
     });
 
     service.list(function (request, response) {
       calls.push(2);
-      return response;
     });
 
     return service.dispatch('list', 'widgets')
@@ -96,12 +92,10 @@ describe('Serene', function () {
 
     service.use(function (request, response) {
       calls.push(1);
-      return response;
     });
 
     service.create(function (request, response) {
       calls.push(2);
-      return response;
     });
 
     return service.dispatch('list', 'widgets')
@@ -109,22 +103,7 @@ describe('Serene', function () {
         expect(calls).to.eql([1]);
       });
   });
-
-  it('should throw an error if no result is returned', function () {
-    service.use(function (request, response) {
-
-    });
-
-    return service.dispatch('list', 'widgets')
-      .then(
-        function () {
-          throw new Error('expected error');
-        },
-        function () {
-        }
-      );
-  });
-
+  
   it('should throw an error if an error is thrown in the handler', function () {
     service.use(function (request, response) {
       throw new Error();
