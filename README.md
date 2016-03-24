@@ -88,7 +88,7 @@ Adds a handler specifically for the `replace` operation.
 
 Adds a handler specifically for the `delete` operation.
 
-#### `dispatch(operation, resourceName, query, body, id)`
+#### `dispatch(operation, resourceName, query, body, id, headers, cookies)`
 
 Dispatches a request to the handlers.
 
@@ -99,6 +99,8 @@ Dispatches a request to the handlers.
   * `query` - an object representing the parsed querystring
   * `body` - an object representing the parsed request body
   * `id` - the ID of the object the request is for
+  * `headers` - the HTTP headers of the request, as a hash
+  * `cookies` - the cookies for the request, as a hash
 
 ## Why "Serene"?
 
