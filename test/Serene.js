@@ -14,11 +14,13 @@ describe('Serene', function () {
     let calls = [];
 
     let expectedRequest = {
-      operation: 'list',
+      operation: {name: 'list', write: false, body: false},
       resourceName: 'widgets',
       query: {size: 5},
       body: {name: 'fred'},
-      id: '3'
+      id: '3',
+      headers: {a: 1},
+      cookies: {b: 2}
     };
 
     service.use(function (request, response) {
@@ -39,7 +41,7 @@ describe('Serene', function () {
       expect(response.headers).to.exist;
     });
 
-    return service.dispatch('list', 'widgets', {size: 5}, {name: 'fred'}, '3')
+    return service.dispatch('list', 'widgets', {size: 5}, {name: 'fred'}, '3', {a: 1}, {b: 2})
       .then(function (response) {
         expect(calls).to.eql([1,2]);
       });
@@ -103,7 +105,7 @@ describe('Serene', function () {
         expect(calls).to.eql([1]);
       });
   });
-  
+
   it('should throw an error if an error is thrown in the handler', function () {
     service.use(function (request, response) {
       throw new Error();

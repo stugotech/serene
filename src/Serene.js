@@ -8,8 +8,13 @@ export default class Serene {
   }
 
 
-  dispatch(operation, resourceName, query, body, id) {
-    let request = {operation, resourceName, query, body, id};
+  dispatch(operationName, resourceName, query, body, id, headers, cookies) {
+    let operation = Serene.operationsHash[operationName];
+
+    if (!operation)
+      throw new Error(`operation ${operationName} not supported`);
+
+    let request = {operation, resourceName, query, body, id, headers, cookies};
     let response = {result: null, status: null, headers: {}, end() {this._end = true;}};
 
     return new Promise((resolve, reject) => {
@@ -26,16 +31,35 @@ export default class Serene {
     } else {
       throw new Error('handler must be either a function or an object with a handle method');
     }
+
+    return this;
   }
 };
 
 
-['list', 'get', 'create', 'update', 'replace', 'delete'].forEach((operation) => {
-  Serene.prototype[operation] = function (handler) {
-    this.use((request, response) =>
-      request.operation === operation ? handler(request, response) : response);
+Serene.operations = [
+  {name: 'list', write: false, body: false},
+  {name: 'get', write: false, body: false},
+  {name: 'create', write: true, body: true},
+  {name: 'update', write: true, body: true},
+  {name: 'replace', write: true, body: true},
+  {name: 'delete', write: true, body: false}
+];
+
+
+Serene.operationsHash = {};
+
+for (let operation of Serene.operations) {
+  Serene.operationsHash[operation.name] = operation;
+
+  Serene.prototype[operation.name] = function (handler) {
+    return this.use(function (request, response) {
+      if (request.operation.name === operation.name) {
+        handler(request, response);
+      }
+    });
   };
-});
+}
 
 
 function reduce(request, response, handlers, i=0) {
