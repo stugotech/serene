@@ -4,6 +4,7 @@ import debug from 'debug';
 
 const traceRequest = debug('serene:request');
 const traceSetup = debug('serene:setup');
+const displayNameKey = Symbol('display name');
 
 
 export default class Serene {
@@ -13,7 +14,7 @@ export default class Serene {
 
 
   dispatch(operationName, resourceName, query, body, id, headers, cookies) {
-    traceRequest(`dispatching ${operationName} to ${resourceName} (id=${id})`);
+    traceRequest(`dispatching ${operationName}:${resourceName} (id=${id})`);
     let operation = Serene.operationsHash[operationName];
 
     if (!operation)
@@ -32,11 +33,13 @@ export default class Serene {
 
   use(handler, operation='use') {
     if (typeof handler === 'function') {
-      traceSetup(`${operation} ${handler.name || handler.toString()}`);
+      handler[displayNameKey] = handler.name || handler.toString();
+      traceSetup(`${operation} ${handler[displayNameKey]}`);
       this.handlers.push(handler);
 
     } else if (handler.handle) {
-      traceSetup(`${operation} ${handler.constructor.name}`);
+      handler[displayNameKey] = handler.constructor.name;
+      traceSetup(`${operation} ${handler[displayNameKey]}`);
       this.handlers.push(handler.handle.bind(handler));
 
     } else {
@@ -81,7 +84,7 @@ for (let operation of Serene.operations) {
 
 function reduce(request, response, handlers, i=0) {
   if (!response._end && i < handlers.length) {
-    traceRequest(`handler ${i}`);
+    traceRequest(`running handler ${i}: ${handlers[i][displayNameKey]}`);
 
     return new Promise((resolve, reject) => {
         Promise.resolve(handlers[i](request, response))
