@@ -1,5 +1,9 @@
 
 import Promise from 'any-promise';
+import debug from 'debug';
+
+const traceRequest = debug('serene:request');
+const traceSetup = debug('serene:setup');
 
 
 export default class Serene {
@@ -9,6 +13,7 @@ export default class Serene {
 
 
   dispatch(operationName, resourceName, query, body, id, headers, cookies) {
+    traceRequest(`dispatching ${operationName} to ${resourceName} (id=${id})`);
     let operation = Serene.operationsHash[operationName];
 
     if (!operation)
@@ -17,17 +22,23 @@ export default class Serene {
     let request = {operation, resourceName, query, body, id, headers, cookies};
     let response = {result: null, status: null, headers: {}, end() {this._end = true;}};
 
-    return new Promise((resolve, reject) => {
-      resolve(reduce(request, response, this.handlers));
-    });
+    return Promise.resolve(reduce(request, response, this.handlers))
+      .then(function () {
+        traceRequest(`dispatched successfully`);
+        return response;
+      });
   }
 
 
-  use(handler) {
+  use(handler, operation='use') {
     if (typeof handler === 'function') {
+      traceSetup(`${operation} ${handler.name || handler.toString()}`);
       this.handlers.push(handler);
+
     } else if (handler.handle) {
+      traceSetup(`${operation} ${handler.constructor.name}`);
       this.handlers.push(handler.handle.bind(handler));
+
     } else {
       throw new Error('handler must be either a function or an object with a handle method');
     }
@@ -53,22 +64,28 @@ for (let operation of Serene.operations) {
   Serene.operationsHash[operation.name] = operation;
 
   Serene.prototype[operation.name] = function (handler) {
-    return this.use(function (request, response) {
+    this.use(handler, operation.name);
+
+    let fn = this.handlers[this.handlers.length - 1];
+
+    this.handlers[this.handlers.length - 1] = (request, response) => {
       if (request.operation.name === operation.name) {
-        handler(request, response);
+        fn(request, response);
       }
-    });
+    }
+
+    return this;
   };
 }
 
 
 function reduce(request, response, handlers, i=0) {
   if (!response._end && i < handlers.length) {
-    return Promise.resolve(handlers[i](request, response))
-      .then(function () {
-        return reduce(request, response, handlers, i + 1)
+    traceRequest(`handler ${i}`);
+
+    return new Promise((resolve, reject) => {
+        Promise.resolve(handlers[i](request, response))
+          .then(() => resolve(reduce(request, response, handlers, i + 1)))
       });
-  } else {
-    return response;
   }
 }

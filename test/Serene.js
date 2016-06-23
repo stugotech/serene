@@ -14,13 +14,17 @@ describe('Serene', function () {
     let calls = [];
 
     let expectedRequest = {
-      operation: {name: 'list', write: false, body: false},
       resourceName: 'widgets',
       query: {size: 5},
       body: {name: 'fred'},
-      id: '3',
-      headers: {a: 1},
-      cookies: {b: 2}
+      cookies: undefined,
+      headers: undefined,
+      operation: {
+        body: false,
+        write: false,
+        name: "list"
+      },
+      id: '3'
     };
 
     service.use(function (request, response) {
@@ -41,7 +45,7 @@ describe('Serene', function () {
       expect(response.headers).to.exist;
     });
 
-    return service.dispatch('list', 'widgets', {size: 5}, {name: 'fred'}, '3', {a: 1}, {b: 2})
+    return service.dispatch('list', 'widgets', {size: 5}, {name: 'fred'}, '3')
       .then(function (response) {
         expect(calls).to.eql([1,2]);
       });
@@ -107,6 +111,8 @@ describe('Serene', function () {
   });
 
   it('should throw an error if an error is thrown in the handler', function () {
+    service.use(() => void 0);
+    
     service.use(function (request, response) {
       throw new Error();
     });
@@ -122,8 +128,8 @@ describe('Serene', function () {
   });
 
   it('should not complain if there are no handlers', function () {
-    let promise = service.dispatch('list', 'widgets');
-    expect(promise.then).to.exist;
+    return service.dispatch('list', 'widgets')
+      .then(function () {});
   });
 
   it('should allow registration of objects with a handle method', function () {
