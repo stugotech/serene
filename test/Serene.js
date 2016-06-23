@@ -110,11 +110,31 @@ describe('Serene', function () {
       });
   });
 
-  it('should throw an error if an error is thrown in the handler', function () {
+  it('should reject if an error is thrown in the handler', function () {
     service.use(() => void 0);
-    
+
     service.use(function (request, response) {
       throw new Error();
+    });
+
+    service.use(() => void 0);
+
+    return service.dispatch('list', 'widgets')
+      .then(
+        function () {
+          throw new Error('expected error');
+        },
+        function () {
+        }
+      );
+  });
+
+
+  it('should reject if a promise is rejected in the handler', function () {
+    service.use(() => void 0);
+
+    service.use(function (request, response) {
+      return Promise.reject('error');
     });
 
     return service.dispatch('list', 'widgets')

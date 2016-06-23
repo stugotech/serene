@@ -90,6 +90,7 @@ function reduce(request, response, handlers, i=0) {
     return new Promise((resolve, reject) => {
         Promise.resolve(handlers[i](request, response))
           .then(() => resolve(reduce(request, response, handlers, i + 1)))
+          .catch((err) => reject(err));
       });
   }
 }
