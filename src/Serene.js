@@ -38,9 +38,10 @@ export default class Serene {
       this.handlers.push(handler);
 
     } else if (handler.handle) {
-      handler[displayNameKey] = handler.constructor.name;
-      traceSetup(`${operation} ${handler[displayNameKey]}`);
-      this.handlers.push(handler.handle.bind(handler));
+      let fn = handler.handle.bind(handler);
+      fn[displayNameKey] = handler.constructor.name;
+      traceSetup(`${operation} ${fn[displayNameKey]}`);
+      this.handlers.push(fn);
 
     } else {
       throw new Error('handler must be either a function or an object with a handle method');
