@@ -32,8 +32,8 @@ export default class Request {
       typeof id !== 'undefined' ? id : this.id
     );
 
-    request.headers = headers;
-    request.cookies = cookies;
+    request.headers = this.headers;
+    request.cookies = this.cookies;
     return request;
   }
 
