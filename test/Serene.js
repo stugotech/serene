@@ -1,6 +1,7 @@
 
 import {expect} from 'chai';
 import Serene from '../src/Serene';
+import Request from '../src/Request';
 
 
 describe('Serene', function () {
@@ -13,23 +14,20 @@ describe('Serene', function () {
   it('should call registered handlers in order', function () {
     let calls = [];
 
-    let expectedRequest = {
-      resourceName: 'widgets',
-      query: {size: 5},
-      body: {name: 'fred'},
-      cookies: undefined,
-      headers: undefined,
-      operation: {
-        body: false,
-        write: false,
-        name: "list"
-      },
-      id: '3'
-    };
-
     service.use(function (request, response) {
       calls.push(1);
-      expect(request).to.eql(expectedRequest);
+
+      expect(request.operation).to.eql({
+        body: false,
+        write: false,
+        name: 'list'
+      });
+
+      expect(request.resourceName).to.equal('widgets');
+      expect(request.query).to.eql({size: 5});
+      expect(request.body).to.eql({name: 'fred'});
+      expect(request.id).to.eql('3');
+
       expect(response.result).to.be.null;
       expect(response.status).to.be.null;
       expect(response.headers).to.exist;
@@ -39,13 +37,16 @@ describe('Serene', function () {
 
     service.use(function (request, response) {
       calls.push(2);
-      expect(request).to.eql(expectedRequest);
       expect(response.result).to.equal('a result');
       expect(response.status).to.be.null;
       expect(response.headers).to.exist;
     });
 
-    return service.dispatch('list', 'widgets', {size: 5}, {name: 'fred'}, '3')
+    let request = new Request(service, 'list', 'widgets', '3');
+    request.query = {size: 5};
+    request.body = {name: 'fred'};
+
+    return request.dispatch()
       .then(function (response) {
         expect(calls).to.eql([1,2]);
       });
@@ -58,7 +59,9 @@ describe('Serene', function () {
       });
     });
 
-    return service.dispatch('list', 'widgets')
+    let request = new Request(service, 'list', 'widgets');
+
+    return request.dispatch()
       .then(function (response) {
         expect(response.value).to.equal(5);
       });
@@ -73,7 +76,9 @@ describe('Serene', function () {
       throw new Error('should not have been called');
     });
 
-    return service.dispatch('list', 'widgets');
+    let request = new Request(service, 'list', 'widgets');
+
+    return request.dispatch();
   });
 
   it('should call specific handler for relevant operation', function () {
@@ -87,7 +92,9 @@ describe('Serene', function () {
       calls.push(2);
     });
 
-    return service.dispatch('list', 'widgets')
+    let request = new Request(service, 'list', 'widgets');
+
+    return request.dispatch()
       .then(function (response) {
         expect(calls).to.eql([1,2]);
       });
@@ -104,7 +111,9 @@ describe('Serene', function () {
       calls.push(2);
     });
 
-    return service.dispatch('list', 'widgets')
+    let request = new Request(service, 'list', 'widgets');
+
+    return request.dispatch()
       .then(function (response) {
         expect(calls).to.eql([1]);
       });
@@ -119,7 +128,9 @@ describe('Serene', function () {
 
     service.use(() => void 0);
 
-    return service.dispatch('list', 'widgets')
+    let request = new Request(service, 'list', 'widgets');
+
+    return request.dispatch()
       .then(
         function () {
           throw new Error('expected error');
@@ -137,7 +148,9 @@ describe('Serene', function () {
       return Promise.reject('error');
     });
 
-    return service.dispatch('list', 'widgets')
+    let request = new Request(service, 'list', 'widgets');
+
+    return request.dispatch()
       .then(
         function () {
           throw new Error('expected error');
@@ -148,7 +161,9 @@ describe('Serene', function () {
   });
 
   it('should not complain if there are no handlers', function () {
-    return service.dispatch('list', 'widgets')
+    let request = new Request(service, 'list', 'widgets');
+
+    return request.dispatch()
       .then(function () {});
   });
 
@@ -166,7 +181,9 @@ describe('Serene', function () {
 
     service.use(obj);
 
-    return service.dispatch('list', 'widgets')
+    let request = new Request(service, 'list', 'widgets');
+
+    return request.dispatch()
       .then(function (response) {
         expect(called).to.be.true;
       });

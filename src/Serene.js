@@ -1,10 +1,10 @@
 
+import Request from './Request';
 import Promise from 'any-promise';
 import debug from 'debug';
 
-const traceRequest = debug('serene:request');
 const traceSetup = debug('serene:setup');
-const displayNameKey = Symbol('display name');
+export const displayNameKey = Symbol('display name');
 
 
 export default class Serene {
@@ -14,20 +14,12 @@ export default class Serene {
 
 
   dispatch(operationName, resourceName, query, body, id, headers, cookies) {
-    traceRequest(`dispatching ${operationName}:${resourceName} (id=${id})`);
-    let operation = Serene.operationsHash[operationName];
-
-    if (!operation)
-      throw new Error(`operation ${operationName} not supported`);
-
-    let request = {operation, resourceName, query, body, id, headers, cookies};
-    let response = {result: null, status: null, headers: {}, end() {this._end = true;}};
-
-    return Promise.resolve(reduce(request, response, this.handlers))
-      .then(function () {
-        traceRequest(`dispatched successfully`);
-        return response;
-      });
+    let request = new Request(this, operationName, resourceName, id);
+    request.query = query;
+    request.body = body;
+    request.headers = headers;
+    request.cookies = cookies;
+    return request.dispatch();
   }
 
 
@@ -80,17 +72,4 @@ for (let operation of Serene.operations) {
 
     return this;
   };
-}
-
-
-function reduce(request, response, handlers, i=0) {
-  if (!response._end && i < handlers.length) {
-    traceRequest(`running handler ${i}: ${handlers[i][displayNameKey]}`);
-
-    return new Promise((resolve, reject) => {
-        Promise.resolve(handlers[i](request, response))
-          .then(() => resolve(reduce(request, response, handlers, i + 1)))
-          .catch((err) => reject(err));
-      });
-  }
 }

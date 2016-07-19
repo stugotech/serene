@@ -58,7 +58,11 @@ The `response` object has the following fields:
 
 The handlers are executed in the order in which they were registered; by default all the handlers registered are executed, unless `response.end()` is called, which prevents further handlers being executed.  If a handler returns a promise, the promise will be awaited before continuing with the next handler.
 
-### API
+### `Serene` class
+
+```js
+import Serene from 'serene';
+```
 
 #### `use(handler)`
 
@@ -88,19 +92,74 @@ Adds a handler specifically for the `replace` operation.
 
 Adds a handler specifically for the `delete` operation.
 
-#### `dispatch(operation, resourceName, query, body, id, headers, cookies)`
+
+### `Request` class
+
+```js
+import {Request} from 'serene';
+```
+
+#### `constructor(serene, baseUrl, operationName, resourceName, id=null)`
 
 Dispatches a request to the handlers.
 
 **Parameters**
 
-  * `operation` - a string, one of the above operation types
-  * `resourceName` - the name of the resource
-  * `query` - an object representing the parsed querystring
-  * `body` - an object representing the parsed request body
+  * `serene` - the instance of serene the request is for
+  * `operationName` - a string, one of the above operation types
+  * `resourceName` - the name of the resource  
   * `id` - the ID of the object the request is for
-  * `headers` - the HTTP headers of the request, as a hash
-  * `cookies` - the cookies for the request, as a hash
+
+#### `serene` property
+
+The instance of serene the request is for.
+
+#### `operationName` property
+
+The name of the operation, e.g., `delete` (see above for list).
+
+#### `resourceName` property
+
+The name of the resource that the request is for.
+
+#### `id` property
+
+The ID of the object the request is for, if applicable.
+
+#### `query` property
+
+An ordinary object hash representing the query parsed query string.
+
+#### `body` property
+
+The body of the request as an ordinary object, i.e., parsed from JSON.
+
+#### `headers` property
+
+An object representing the HTTP headers.
+
+#### `cookies` property
+
+An object representing the HTTP cookies.
+
+#### `response` property
+
+An instance of `Response` (see below) for the request.
+
+
+### `Response` class
+
+#### `result` property
+
+The result of the API call.
+
+#### `status` property
+
+Integer HTTP status code.
+
+#### `headers` property
+
+A hash representing the headers to send.
 
 ## Why "Serene"?
 
