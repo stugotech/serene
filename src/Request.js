@@ -25,16 +25,15 @@ export default class Request {
 
 
   subrequest(operationName, resourceName, id) {
-    let request = new Request(
-      this.serene,
+    return new this.serene.request(
       operationName || this.operationName,
       resourceName || this.resourceName,
-      typeof id !== 'undefined' ? id : this.id
+      null,
+      null,
+      typeof id !== 'undefined' ? id : this.id,
+      this.headers,
+      this.cookies
     );
-
-    request.headers = this.headers;
-    request.cookies = this.cookies;
-    return request;
   }
 
 
