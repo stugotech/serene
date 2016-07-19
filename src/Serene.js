@@ -8,13 +8,14 @@ export const displayNameKey = Symbol('display name');
 
 
 export default class Serene {
-  constructor() {
+  constructor(RequestClass=Request) {
     this.handlers = [];
+    this.RequestClass = RequestClass;
   }
 
 
   request(operationName, resourceName, query, body, id, headers, cookies) {
-    let request = new Request(this, operationName, resourceName, id);
+    let request = new this.RequestClass(this, operationName, resourceName, id);
     request.query = query;
     request.body = body;
     request.headers = headers;
