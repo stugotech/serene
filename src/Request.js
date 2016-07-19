@@ -25,7 +25,7 @@ export default class Request {
 
 
   subrequest(operationName, resourceName, id) {
-    return new this.serene.request(
+    return this.serene.request(
       operationName || this.operationName,
       resourceName || this.resourceName,
       null,
