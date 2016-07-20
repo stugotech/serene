@@ -1,6 +1,6 @@
 {
   "name": "serene",
-  "version": "0.22.0",
+  "version": "0.23.0",
   "description": "Abstraction for REST APIs",
   "main": "index.js",
   "directories": {

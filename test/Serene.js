@@ -188,4 +188,18 @@ describe('Serene', function () {
         expect(called).to.be.true;
       });
   });
+
+  it('should allow subrequests', function () {
+    let request = new Request(service, 'list', 'widgets');
+    request.query = {a: 1};
+    request.foo = 1;
+
+    let subrequest = request.subrequest('get', 'weasels', 1);
+    expect(subrequest.operation.name).to.equal('get');
+    expect(subrequest.resourceName).to.equal('weasels');
+    expect(subrequest.id).to.equal(1);
+    expect(subrequest.query).to.eql({});
+    expect(subrequest.foo).to.equal(1);
+    expect(subrequest.response === request.response).to.be.false;
+  });
 });

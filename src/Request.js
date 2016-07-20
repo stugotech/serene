@@ -25,16 +25,13 @@ export default class Request {
 
 
   subrequest(operationName, resourceName, id) {
-    return this.serene.request(
-      operationName || this.operationName,
-      resourceName || this.resourceName,
-      {},
-      null,
-      typeof id !== 'undefined' ? id : this.id,
-      this.headers,
-      this.cookies,
-      this.baseUrl
-    );
+    let request = new this.serene.RequestClass(this.serene, operationName, resourceName, id);
+
+    Object.keys(this)
+      .filter((key) => ['serene', 'operation', 'resourceName', 'id', 'query', 'response'].indexOf(key) === -1)
+      .forEach((key) => request[key] = this[key]);
+
+    return request;
   }
 
 
