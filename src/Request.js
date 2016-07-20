@@ -32,7 +32,8 @@ export default class Request {
       null,
       typeof id !== 'undefined' ? id : this.id,
       this.headers,
-      this.cookies
+      this.cookies,
+      this.baseUrl
     );
   }
 

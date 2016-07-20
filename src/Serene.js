@@ -14,18 +14,19 @@ export default class Serene {
   }
 
 
-  request(operationName, resourceName, query, body, id, headers, cookies) {
+  request(operationName, resourceName, query, body, id, headers, cookies, baseUrl) {
     let request = new this.RequestClass(this, operationName, resourceName, id);
     request.query = query;
     request.body = body;
     request.headers = headers;
     request.cookies = cookies;
+    request.baseUrl = baseUrl;
     return request;
   }
 
 
-  dispatch(operationName, resourceName, query, body, id, headers, cookies) {
-    return this.request(operationName, resourceName, query, body, id, headers, cookies);
+  dispatch(operationName, resourceName, query, body, id, headers, cookies, baseUrl) {
+    return this.request(operationName, resourceName, query, body, id, headers, cookies, baseUrl);
   }
 
 
