@@ -28,7 +28,7 @@ export default class Request {
     return this.serene.request(
       operationName || this.operationName,
       resourceName || this.resourceName,
-      null,
+      {},
       null,
       typeof id !== 'undefined' ? id : this.id,
       this.headers,
